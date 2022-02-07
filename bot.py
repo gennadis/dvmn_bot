@@ -32,12 +32,12 @@ def get_long_polling(token: str, timestamp: float, timeout: int = 120) -> list[d
     return response.json()
 
 
-def main(token: str):
+def main(dvmn_token: str, bot: telegram.Bot, chat_id: int):
     timestamp = time.time()
 
     while True:
         try:
-            response = get_long_polling(token, timestamp)
+            response = get_long_polling(dvmn_token, timestamp)
 
         except (
             requests.exceptions.ReadTimeout,
@@ -47,11 +47,10 @@ def main(token: str):
             continue
 
         else:
-            pprint(response)
-
             if response["status"] == "timeout":
                 timestamp = response["timestamp_to_request"]
             elif response["status"] == "found":
+                bot.send_message(text="Преподаватель проверил работу!", chat_id=chat_id)
                 timestamp = response["last_attempt_timestamp"]
 
 
@@ -62,5 +61,4 @@ if __name__ == "__main__":
     chat_id = os.getenv("CHAT_ID")
 
     bot = telegram.Bot(token=telegram_token)
-
-    bot.send_message(text="Hey, dude!", chat_id=chat_id)
+    main(dvmn_token, bot, chat_id)
