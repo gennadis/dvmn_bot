@@ -5,7 +5,6 @@ import requests
 import telegram
 from dotenv import load_dotenv
 
-DVMN_REVIEWS_URL = "https://dvmn.org/api/user_reviews/"
 DVMN_LONGPOLLING_URL = "https://dvmn.org/api/long_polling/"
 
 
@@ -23,7 +22,7 @@ def get_response(token: str, timestamp: float, timeout: int = 120) -> list[dict]
     return response.json()
 
 
-def compose_notification_text(attempt: dict) -> str:
+def compose_notification(attempt: dict) -> str:
     lesson_reviewed = f"Преподаватель проверил урок «{attempt['lesson_title']}»."
     lesson_url = f"Ссылка на задачу: {attempt['lesson_url']}"
 
@@ -42,7 +41,7 @@ def run_long_poll(dvmn_token: str, bot: telegram.Bot, chat_id: int) -> None:
 
     while True:
         try:
-            response = get_response(dvmn_token, timestamp)
+            response = get_response(token=dvmn_token, timestamp=timestamp)
 
         except requests.exceptions.ReadTimeout:
             continue
@@ -54,9 +53,9 @@ def run_long_poll(dvmn_token: str, bot: telegram.Bot, chat_id: int) -> None:
         if response["status"] == "timeout":
             timestamp = response["timestamp_to_request"]
         elif response["status"] == "found":
-            notification_text = compose_notification_text(response["new_attempts"][0])
-            bot.send_message(text=notification_text, chat_id=chat_id)
             timestamp = response["last_attempt_timestamp"]
+            notification = compose_notification(response["new_attempts"][0])
+            bot.send_message(text=notification, chat_id=chat_id)
 
 
 if __name__ == "__main__":
