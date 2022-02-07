@@ -17,18 +17,12 @@ def get_reviews(token: str):
     return response.json()
 
 
-def get_long_polling(token: str):
+def get_long_polling(token: str, timeout: int):
     headers = {"Authorization": f"Token {token}"}
-    # params = {"timestamp": time.time()}
-    while True:
-        response = requests.get(DVMN_LONGPOLLING_URL, headers=headers)
-        response_object = response.json()
+    response = requests.get(DVMN_LONGPOLLING_URL, headers=headers, timeout=timeout)
+    response.raise_for_status()
 
-        if response_object["status"] == "found":
-            pprint(response_object)
-            continue
-        else:
-            pprint(response_object)
+    return response.json()
 
 
 def main():
@@ -40,4 +34,9 @@ if __name__ == "__main__":
     token = os.getenv("DVMN_TOKEN")
 
     # pprint(get_reviews(token))
-    get_long_polling(token)
+    while True:
+        try:
+            print(get_long_polling(token, 5))
+        except requests.exceptions.ReadTimeout:
+            print("restart")
+            continue
