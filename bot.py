@@ -3,6 +3,7 @@ import time
 from pprint import pprint
 
 import requests
+import telegram
 from dotenv import load_dotenv
 
 DVMN_REVIEWS_URL = "https://dvmn.org/api/user_reviews/"
@@ -56,5 +57,10 @@ def main(token: str):
 
 if __name__ == "__main__":
     load_dotenv()
-    token = os.getenv("DVMN_TOKEN")
-    main(token)
+    dvmn_token = os.getenv("DVMN_TOKEN")
+    telegram_token = os.getenv("TELEGRAM_TOKEN")
+    chat_id = os.getenv("CHAT_ID")
+
+    bot = telegram.Bot(token=telegram_token)
+
+    bot.send_message(text="Hey, dude!", chat_id=chat_id)
