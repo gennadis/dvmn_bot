@@ -17,28 +17,44 @@ def get_reviews(token: str):
     return response.json()
 
 
-def get_long_polling(token: str, timeout: int):
+def get_long_polling(token: str, timestamp: float, timeout: int = 120) -> list[dict]:
     headers = {"Authorization": f"Token {token}"}
-    response = requests.get(DVMN_LONGPOLLING_URL, headers=headers, timeout=timeout)
+    params = {"timestamp": timestamp}
+    response = requests.get(
+        url=DVMN_LONGPOLLING_URL,
+        headers=headers,
+        params=params,
+        timeout=timeout,
+    )
     response.raise_for_status()
 
     return response.json()
 
 
-def main():
-    pass
-
-
-if __name__ == "__main__":
-    load_dotenv()
-    token = os.getenv("DVMN_TOKEN")
-
+def main(token: str):
+    start_timestamp = None
     while True:
+        print(start_timestamp)
         try:
-            print(get_long_polling(token, 60))
+            response = get_long_polling(token=token, timestamp=start_timestamp)
+
         except (
             requests.exceptions.ReadTimeout,
             requests.exceptions.ConnectionError,
         ) as e:
             print(f"restart cause: {e}")
             continue
+
+        else:
+            print(response)
+
+            if response["status"] == "timeout":
+                start_timestamp = response["timestamp_to_request"]
+            elif response["status"] == "found":
+                start_timestamp = response["last_attempt_timestamp"]
+
+
+if __name__ == "__main__":
+    load_dotenv()
+    token = os.getenv("DVMN_TOKEN")
+    main(token)
