@@ -32,11 +32,11 @@ def get_long_polling(token: str, timestamp: float, timeout: int = 120) -> list[d
 
 
 def main(token: str):
-    start_timestamp = None
+    timestamp = time.time()
+
     while True:
-        print(start_timestamp)
         try:
-            response = get_long_polling(token=token, timestamp=start_timestamp)
+            response = get_long_polling(token, timestamp)
 
         except (
             requests.exceptions.ReadTimeout,
@@ -46,12 +46,12 @@ def main(token: str):
             continue
 
         else:
-            print(response)
+            pprint(response)
 
             if response["status"] == "timeout":
-                start_timestamp = response["timestamp_to_request"]
+                timestamp = response["timestamp_to_request"]
             elif response["status"] == "found":
-                start_timestamp = response["last_attempt_timestamp"]
+                timestamp = response["last_attempt_timestamp"]
 
 
 if __name__ == "__main__":
