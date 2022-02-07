@@ -44,23 +44,19 @@ def run_long_poll(dvmn_token: str, bot: telegram.Bot, chat_id: int) -> None:
         try:
             response = get_response(dvmn_token, timestamp)
 
-        except (
-            requests.exceptions.ReadTimeout,
-            requests.exceptions.ConnectionError,
-        ) as e:
-            print(f"Long polling restart cause: {e}")
-            time.sleep(5)
+        except requests.exceptions.ReadTimeout:
             continue
 
-        else:
-            if response["status"] == "timeout":
-                timestamp = response["timestamp_to_request"]
-            elif response["status"] == "found":
-                notification_text = compose_notification_text(
-                    response["new_attempts"][0]
-                )
-                bot.send_message(text=notification_text, chat_id=chat_id)
-                timestamp = response["last_attempt_timestamp"]
+        except requests.exceptions.ConnectionError:
+            time.sleep(10)
+            continue
+
+        if response["status"] == "timeout":
+            timestamp = response["timestamp_to_request"]
+        elif response["status"] == "found":
+            notification_text = compose_notification_text(response["new_attempts"][0])
+            bot.send_message(text=notification_text, chat_id=chat_id)
+            timestamp = response["last_attempt_timestamp"]
 
 
 if __name__ == "__main__":
