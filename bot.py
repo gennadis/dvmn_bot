@@ -9,14 +9,6 @@ DVMN_REVIEWS_URL = "https://dvmn.org/api/user_reviews/"
 DVMN_LONGPOLLING_URL = "https://dvmn.org/api/long_polling/"
 
 
-def get_reviews(token: str) -> list[dict]:
-    headers = {"Authorization": f"Token {token}"}
-    response = requests.get(DVMN_REVIEWS_URL, headers=headers)
-    response.raise_for_status()
-
-    return response.json()
-
-
 def get_response(token: str, timestamp: float, timeout: int = 120) -> list[dict]:
     headers = {"Authorization": f"Token {token}"}
     params = {"timestamp": timestamp}
