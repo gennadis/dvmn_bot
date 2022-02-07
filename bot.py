@@ -33,10 +33,12 @@ if __name__ == "__main__":
     load_dotenv()
     token = os.getenv("DVMN_TOKEN")
 
-    # pprint(get_reviews(token))
     while True:
         try:
-            print(get_long_polling(token, 5))
-        except requests.exceptions.ReadTimeout:
-            print("restart")
+            print(get_long_polling(token, 60))
+        except (
+            requests.exceptions.ReadTimeout,
+            requests.exceptions.ConnectionError,
+        ) as e:
+            print(f"restart cause: {e}")
             continue
