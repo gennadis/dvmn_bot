@@ -14,9 +14,6 @@ class TelegramLogsHandler(logging.Handler):
         super().__init__()
         self.chat_id = chat_id
         self.tg_bot = telegram.Bot(token=tg_token)
-        self.tg_bot.send_message(
-            chat_id=self.chat_id, text="📗 Telegram bot started successfully"
-        )
 
     def emit(self, record):
         log_entry = self.format(record)
@@ -61,14 +58,14 @@ def run_long_poll(dvmn_token: str, logger: logging.Logger) -> None:
 
         except requests.exceptions.ReadTimeout:
             logger.error(
-                msg="Server did not send any data in the allotted amount of time.",
+                msg="📕 Server did not send any data in the allotted amount of time.",
                 exc_info=True,
             )
             continue
 
         except requests.exceptions.ConnectionError:
             logger.error(
-                msg="Connection error occurred.",
+                msg="📕 Connection error occurred.",
                 exc_info=True,
             )
             time.sleep(10)
@@ -93,5 +90,6 @@ if __name__ == "__main__":
     logger.addHandler(
         TelegramLogsHandler(tg_token=telegram_token, chat_id=user_chat_id)
     )
+    logger.info("📗 Telegram bot started successfully")
 
     run_long_poll(dvmn_token=dvmn_token, logger=logger)
