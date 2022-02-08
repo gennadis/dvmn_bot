@@ -9,6 +9,17 @@ from dotenv import load_dotenv
 DVMN_LONGPOLLING_URL = "https://dvmn.org/api/long_polling/"
 
 
+class TelegramLogsHandler(logging.Handler):
+    def __init__(self, tg_token, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = telegram.Bot(token=tg_token)
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
+
 def get_code_review(token: str, timestamp: float, timeout: int = 120) -> list[dict]:
     headers = {"Authorization": f"Token {token}"}
     params = {"timestamp": timestamp}
@@ -37,7 +48,8 @@ def compose_notification(attempt: dict) -> str:
     return f"{lesson_reviewed}\n{review_result}\n{lesson_url}"
 
 
-def run_long_poll(dvmn_token: str, bot: telegram.Bot, chat_id: int) -> None:
+def run_long_poll(dvmn_token: str, logger: logging.Logger) -> None:
+    logger.info("Long polling started")
     timestamp = time.time()
 
     while True:
@@ -56,18 +68,25 @@ def run_long_poll(dvmn_token: str, bot: telegram.Bot, chat_id: int) -> None:
         elif review["status"] == "found":
             timestamp = review["last_attempt_timestamp"]
             notification = compose_notification(review["new_attempts"][0])
-            bot.send_message(text=notification, chat_id=chat_id)
+            logger.info(notification)
+            # bot.send_message(text=notification, chat_id=chat_id)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-
     load_dotenv()
     dvmn_token = os.getenv("DVMN_TOKEN")
     telegram_token = os.getenv("TELEGRAM_TOKEN")
     user_chat_id = os.getenv("TG_CHAT_ID")
 
-    bot = telegram.Bot(token=telegram_token)
-    logging.info("Telegram bot started")
+    # bot = telegram.Bot(token=telegram_token)
+    # logger.info("Telegram bot started")
 
-    run_long_poll(dvmn_token=dvmn_token, bot=bot, chat_id=user_chat_id)
+    logging.basicConfig(filename="dev.log", level=logging.INFO)
+    logger = logging.getLogger("Logger")
+    # logger.setLevel(logging.INFO)
+    logger.addHandler(
+        TelegramLogsHandler(tg_token=telegram_token, chat_id=user_chat_id)
+    )
+    logger.info("Telegram bot started")
+
+    run_long_poll(dvmn_token=dvmn_token, logger=logger)
