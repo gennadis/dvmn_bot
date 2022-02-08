@@ -82,7 +82,7 @@ if __name__ == "__main__":
     telegram_token = os.getenv("TELEGRAM_TOKEN")
     user_chat_id = os.getenv("TG_CHAT_ID")
 
-    logging.basicConfig(filename="dev.log", level=logging.INFO)
+    logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("Logger")
     logger.addHandler(
         TelegramLogsHandler(tg_token=telegram_token, chat_id=user_chat_id)
