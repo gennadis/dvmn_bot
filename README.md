@@ -9,6 +9,7 @@ This telegram bot project notifies you every time you get a code review on [Dvmn
 - Notifies you instantly on every code review
 - Tells you code review results
 - Heroku ready!
+- Error logging
 
 ## Installation
 1. Clone project
