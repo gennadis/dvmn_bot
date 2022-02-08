@@ -62,7 +62,7 @@ if __name__ == "__main__":
     load_dotenv()
     dvmn_token = os.getenv("DVMN_TOKEN")
     telegram_token = os.getenv("TELEGRAM_TOKEN")
-    user_chat_id = os.getenv("CHAT_ID")
+    user_chat_id = os.getenv("TG_CHAT_ID")
 
     bot = telegram.Bot(token=telegram_token)
     run_long_poll(dvmn_token=dvmn_token, bot=bot, chat_id=user_chat_id)
