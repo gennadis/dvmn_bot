@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 DVMN_LONGPOLLING_URL = "https://dvmn.org/api/long_polling/"
 
 
-def get_response(token: str, timestamp: float, timeout: int = 120) -> list[dict]:
+def get_code_review(token: str, timestamp: float, timeout: int = 120) -> list[dict]:
     headers = {"Authorization": f"Token {token}"}
     params = {"timestamp": timestamp}
     response = requests.get(
@@ -41,7 +41,7 @@ def run_long_poll(dvmn_token: str, bot: telegram.Bot, chat_id: int) -> None:
 
     while True:
         try:
-            response = get_response(token=dvmn_token, timestamp=timestamp)
+            review = get_code_review(token=dvmn_token, timestamp=timestamp)
 
         except requests.exceptions.ReadTimeout:
             continue
@@ -50,11 +50,11 @@ def run_long_poll(dvmn_token: str, bot: telegram.Bot, chat_id: int) -> None:
             time.sleep(10)
             continue
 
-        if response["status"] == "timeout":
-            timestamp = response["timestamp_to_request"]
-        elif response["status"] == "found":
-            timestamp = response["last_attempt_timestamp"]
-            notification = compose_notification(response["new_attempts"][0])
+        if review["status"] == "timeout":
+            timestamp = review["timestamp_to_request"]
+        elif review["status"] == "found":
+            timestamp = review["last_attempt_timestamp"]
+            notification = compose_notification(review["new_attempts"][0])
             bot.send_message(text=notification, chat_id=chat_id)
 
 
