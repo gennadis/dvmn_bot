@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+from xml.sax.handler import feature_namespace_prefixes
 
 import requests
 import telegram
@@ -56,19 +57,8 @@ def run_long_poll(dvmn_token: str, logger: logging.Logger) -> None:
         try:
             review = get_code_review(token=dvmn_token, timestamp=timestamp)
 
-        except requests.exceptions.ReadTimeout:
-            logger.error(
-                msg="📕 Server did not send any data in the allotted amount of time.",
-                exc_info=True,
-            )
-            continue
-
-        except requests.exceptions.ConnectionError:
-            logger.error(
-                msg="📕 Connection error occurred.",
-                exc_info=True,
-            )
-            time.sleep(10)
+        except Exception:
+            logger.exception()
             continue
 
         if review["status"] == "timeout":
