@@ -1,7 +1,6 @@
 import logging
 import os
 import time
-from xml.sax.handler import feature_namespace_prefixes
 
 import requests
 import telegram
