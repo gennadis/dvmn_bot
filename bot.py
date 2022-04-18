@@ -72,7 +72,7 @@ if __name__ == "__main__":
     load_dotenv()
     dvmn_token = os.getenv("DVMN_TOKEN")
     telegram_token = os.getenv("TELEGRAM_TOKEN")
-    user_chat_id = os.getenv("TG_CHAT_ID")
+    user_chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("Logger")
