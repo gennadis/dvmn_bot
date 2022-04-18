@@ -11,6 +11,25 @@ This telegram bot project notifies you every time you get a code review on [Dvmn
 - Heroku ready!
 - Error logging
 
+## Run with `Docker`
+1. Clone project
+```bash
+git clone https://github.com/gennadis/dvmn_bot.git
+cd dvmn_bot
+```
+
+2. Build `Docker` image
+```bash
+docker build --tag dvmn-review-bot .
+```
+
+3. Rename `.env.example` to `.env` and place your secrets in it.  
+
+4. Run `Docker` container
+```bash
+docker run -d --env-file ./.env dvmn-review-bot
+```
+
 ## Installation
 1. Clone project
 ```bash
@@ -29,10 +48,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Rename `.env.example` to `.env` and fill your secrets in it.  
+4. Rename `.env.example` to `.env` and place your secrets in it.  
 
 5. Run telegram bot
 ```bash
 python bot.py
 ```
-
