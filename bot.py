@@ -56,8 +56,8 @@ def run_long_poll(dvmn_token: str, logger: logging.Logger) -> None:
         try:
             review = get_code_review(token=dvmn_token, timestamp=timestamp)
 
-        except Exception:
-            logger.exception()
+        except Exception as e:
+            logger.exception(e, exc_info=True)
             continue
 
         if review["status"] == "timeout":
