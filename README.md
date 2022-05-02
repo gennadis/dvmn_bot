@@ -26,7 +26,7 @@ docker build --tag dvmn-review-bot .
 
 4. Run `Docker` container
 ```bash
-docker run -d --name review-bot --env-file ./.env dvmn-review-bot
+docker run -d --name review-bot --env-file ./.env --restart always dvmn-review-bot
 ```
 
 ## Installation
