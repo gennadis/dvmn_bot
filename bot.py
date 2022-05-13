@@ -49,14 +49,17 @@ def compose_notification(attempt: dict) -> str:
 
 
 def run_long_poll(dvmn_token: str, logger: logging.Logger) -> None:
-    logger.info("📗 Dvmn API long polling started successfully")
     timestamp = time.time()
+    logger.info("📗 Telegram bot started.")
 
     while True:
         try:
             review = get_code_review(token=dvmn_token, timestamp=timestamp)
-
-        except Exception as e:
+        except requests.exceptions.ConnectTimeout:
+            logger.warning("Connection timeout. Retry in 5 minutes.")
+            time.sleep(300)  # 5 MINUTES
+            continue
+        except requests.exceptions.RequestException as e:
             logger.exception(e, exc_info=True)
             continue
 
@@ -79,6 +82,5 @@ if __name__ == "__main__":
     logger.addHandler(
         TelegramLogsHandler(tg_token=telegram_token, chat_id=user_chat_id)
     )
-    logger.info("📗 Telegram bot started successfully")
 
     run_long_poll(dvmn_token=dvmn_token, logger=logger)
