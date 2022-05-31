@@ -55,12 +55,9 @@ def run_long_poll(dvmn_token: str, logger: logging.Logger) -> None:
     while True:
         try:
             review = get_code_review(token=dvmn_token, timestamp=timestamp)
-        except requests.exceptions.ConnectTimeout:
+        except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
             logger.warning("Connection timeout. Retry in 5 minutes.")
             time.sleep(300)  # 5 MINUTES
-            continue
-        except requests.exceptions.RequestException as e:
-            logger.exception(e, exc_info=True)
             continue
 
         if review["status"] == "timeout":
