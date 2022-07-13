@@ -4,7 +4,6 @@ import time
 
 import requests
 import telegram
-from dotenv import load_dotenv
 
 DVMN_LONGPOLLING_URL = "https://dvmn.org/api/long_polling/"
 
@@ -80,7 +79,6 @@ def run_long_poll(dvmn_token: str, logger: logging.Logger) -> None:
 
 
 if __name__ == "__main__":
-    load_dotenv()
     dvmn_token = os.getenv("DVMN_TOKEN")
     telegram_token = os.getenv("TELEGRAM_TOKEN")
     user_chat_id = os.getenv("TELEGRAM_CHAT_ID")
