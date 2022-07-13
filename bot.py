@@ -60,13 +60,13 @@ def run_long_poll(dvmn_token: str, logger: logging.Logger) -> None:
             time.sleep(300)  # 5 MINUTES
             logger.info("Trying again...")
             continue
-        except requests.exceptions.HTTPError as error:
-            logger.error(error)
+        except requests.exceptions.HTTPError:
+            logger.error("HTTP error occured. Will try again in 10 minutes...")
             time.sleep(600)  # 10 MINUTES
             logger.info("Trying again...")
             continue
-        except Exception as exception:
-            logger.exception(f"An exception occured: {exception}")
+        except requests.RequestException:
+            logger.exception(f"An exception occured. Will try again in 10 minutes...")
             time.sleep(300)  # 5 MINUTES
             logger.info("Trying again...")
             continue
