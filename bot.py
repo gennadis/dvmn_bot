@@ -50,24 +50,20 @@ def compose_notification(attempt: dict) -> str:
 def run_long_poll(dvmn_token: str, error_timeout: int, logger: logging.Logger) -> None:
     timestamp = time.time()
     logger.info("📗 Telegram bot started.")
+    error_message = (
+        f"An error has occured. Will try again in {error_timeout} seconds..."
+    )
 
     while True:
         try:
             review = get_code_review(token=dvmn_token, timestamp=timestamp)
-        except requests.exceptions.Timeout:
-            logger.error("Timeout error occured. Will try again in 5 minutes...")
+        except (
+            requests.exceptions.Timeout,
+            requests.exceptions.HTTPError,
+            requests.RequestException,
+        ):
+            logger.error(error_message)
             time.sleep(error_timeout)
-            logger.info("Trying again...")
-            continue
-        except requests.exceptions.HTTPError:
-            logger.error("HTTP error occured. Will try again in 10 minutes...")
-            time.sleep(error_timeout)
-            logger.info("Trying again...")
-            continue
-        except requests.RequestException:
-            logger.exception(f"An exception occured. Will try again in 10 minutes...")
-            time.sleep(error_timeout)
-            logger.info("Trying again...")
             continue
 
         if review["status"] == "timeout":
