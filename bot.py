@@ -86,4 +86,4 @@ if __name__ == "__main__":
         TelegramLogsHandler(tg_token=telegram_token, chat_id=user_chat_id)
     )
 
-    run_long_poll(dvmn_token=dvmn_token, logger=logger)
+    run_long_poll(dvmn_token=dvmn_token, error_timeout=error_timeout, logger=logger)
