@@ -47,7 +47,7 @@ def compose_notification(attempt: dict) -> str:
     return f"{lesson_reviewed}\n{review_result}\n{lesson_url}"
 
 
-def run_long_poll(dvmn_token: str, logger: logging.Logger) -> None:
+def run_long_poll(dvmn_token: str, error_timeout: int, logger: logging.Logger) -> None:
     timestamp = time.time()
     logger.info("📗 Telegram bot started.")
 
@@ -56,17 +56,17 @@ def run_long_poll(dvmn_token: str, logger: logging.Logger) -> None:
             review = get_code_review(token=dvmn_token, timestamp=timestamp)
         except requests.exceptions.Timeout:
             logger.error("Timeout error occured. Will try again in 5 minutes...")
-            time.sleep(300)  # 5 MINUTES
+            time.sleep(error_timeout)
             logger.info("Trying again...")
             continue
         except requests.exceptions.HTTPError:
             logger.error("HTTP error occured. Will try again in 10 minutes...")
-            time.sleep(600)  # 10 MINUTES
+            time.sleep(error_timeout)
             logger.info("Trying again...")
             continue
         except requests.RequestException:
             logger.exception(f"An exception occured. Will try again in 10 minutes...")
-            time.sleep(300)  # 5 MINUTES
+            time.sleep(error_timeout)
             logger.info("Trying again...")
             continue
 
@@ -82,6 +82,7 @@ if __name__ == "__main__":
     dvmn_token = os.getenv("DVMN_TOKEN")
     telegram_token = os.getenv("TELEGRAM_TOKEN")
     user_chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    error_timeout = os.getenv("ERROR_TIMEOUT")
 
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("Logger")
